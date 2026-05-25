@@ -34,7 +34,7 @@ function Home() {
                 <Container>
                     <div className='flex flex-wrap'>
                         {posts.map((post) => (
-                            <div key={post.$id} className='p-2 w-1/4'>
+                            <div key={post.$id} className='p-2 w-full sm:w-1/2 lg:w-1/4'>
                                 {/* Yaha par hum aise 'post' nhi de skte kyunki 1 hi post aayegi to isse achha ye hai ki hum usko spread karde fi jitni bhi posts hai vpo 1-1 karke aate jayegi. */}
                                 <PostCard {...post} />
                             </div>
