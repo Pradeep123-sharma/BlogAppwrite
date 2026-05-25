@@ -31,11 +31,16 @@ function PostForm({post}) {
 
     // Handling logic for submit button click
     const submit = async (data) => {
-        if (post) {
-            // File handling 
-            const file = data.image[0] ? await service.uploadFile(data.image[0]) : null
+        const selectedFile = data.image?.[0] ?? null
+        const file = selectedFile ? await service.uploadFile(selectedFile) : null
 
-            // Deleting the existing file
+        if (selectedFile && !file) {
+            alert('Image upload failed. Please try again.')
+            return
+        }
+
+        if (post) {
+            // Deleting the existing file when a new file is uploaded
             if (file) {
                 service.deleteFile(post.featuredImage)
             }
@@ -46,21 +51,16 @@ function PostForm({post}) {
             if (dbPost) {
                 navigate(`/post/${dbPost.$id}`)
             }
-        }else {
-            // Uploading file
-            const file = data.image[0] ? await service.uploadFile(data.image[0]) : null
-            if (file) {
-                const fileId = file.$id
-                data.featuredImage = fileId
-                /* Yaha par hum 'data' aise directly pass nhi kar skte kya pata problem ho jaye isliye spread kar rhe hai */
-                const dbPost = await service.createPost({
-                    ...data,
-                    userId: userData.$id
-                })
-                if (dbPost) {
-                    navigate(`/post/${dbPost.$id}`)
-                }
-            } 
+        } else {
+            const fileId = file ? file.$id : ''
+            const dbPost = await service.createPost({
+                ...data,
+                featuredImage: fileId,
+                userId: userData.$id
+            })
+            if (dbPost) {
+                navigate(`/post/${dbPost.$id}`)
+            }
         }
     }
 
@@ -121,7 +121,7 @@ function PostForm({post}) {
                     type="file"
                     className="mb-4"
                     accept="image/png, image/jpg, image/jpeg, image/gif"
-                    {...register("image", { required: !post })}
+                    {...register("image")}
                 />
                 {post?.featuredImage && (
                     <div className="w-full mb-4">
